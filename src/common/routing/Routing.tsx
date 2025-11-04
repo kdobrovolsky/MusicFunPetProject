@@ -1,6 +1,6 @@
 import {Route, Routes} from "react-router";
 import {MainPage} from "@/app/ui/MainPage/MainPage.tsx";
-import {PlaylistsPage} from "@/features/playlists/ui/PlaylistsPage.tsx";
+import {PlaylistsPage} from "@/features/playlists/ui/PlaylistsPage/PlaylistsPage.tsx";
 import {TracksPage} from "@/features/tracks/ui/TraksPage.tsx";
 import {ProfilePage} from "@/features/auth/ui/ProfilePage/ProfilePage.tsx";
 import {PageNotFound} from "@/common/components";
