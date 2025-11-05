@@ -5,14 +5,17 @@ type Props = {
     currentPage: number
     setCurrentPage: (page: number) => void
     pagesCount: number
+    pageSize: number
+    changePageSize: (size: number) => void
 }
 
-export const Pagination = ({ currentPage, setCurrentPage, pagesCount }: Props) => {
+export const Pagination = ({ currentPage, setCurrentPage, pagesCount,changePageSize,pageSize }: Props) => {
     if (pagesCount <= 1) return null
 
     const pages = getPaginationPages(currentPage, pagesCount)
 
     return (
+        <div>
         <div className={s.pagination}>
             {pages.map((page, idx) =>
                     page === '...' ? (
@@ -33,6 +36,18 @@ export const Pagination = ({ currentPage, setCurrentPage, pagesCount }: Props) =
                         </button>
                     )
             )}
+        </div>
+            <label>
+                Show
+                <select value={pageSize} onChange={e => changePageSize(Number(e.target.value))}>
+                    {[2, 4, 8, 16, 32].map(size => (
+                        <option value={size} key={size}>
+                            {size}
+                        </option>
+                    ))}
+                </select>
+                per page
+            </label>
         </div>
     )
 }
