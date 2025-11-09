@@ -27,7 +27,7 @@ export const playlistsApi = baseApi.injectEndpoints({
             }),
             invalidatesTags:['Playlist']
         }),
-        deletePlaylist: build.mutation<void,  string >({
+        deletePlaylist: build.mutation<void, string>({
             query: (playlistId) => ({
                 method: 'DELETE',
                 url: `playlists/${playlistId}`,
@@ -38,9 +38,43 @@ export const playlistsApi = baseApi.injectEndpoints({
             query: ({ playlistId, body }) => ({
                 url: `playlists/${playlistId}`,
                 method: 'PUT',
-                body,
+                body
             }),
-            invalidatesTags:['Playlist']
+            async onQueryStarted({ playlistId, body }, { dispatch, queryFulfilled, getState }) {
+                const args = playlistsApi.util.selectCachedArgsForQuery(getState(), 'fetchPlaylists')
+
+                const patchResults: any[] = []
+
+                args.forEach(arg => {
+                    patchResults.push(
+                        dispatch(
+                            playlistsApi.util.updateQueryData(
+                                'fetchPlaylists',
+                                {
+                                    pageNumber: arg.pageNumber,
+                                    pageSize: arg.pageSize,
+                                    search: arg.search,
+                                },
+                                state => {
+                                    const index = state.data.findIndex(playlist => playlist.id === playlistId)
+                                    if (index !== -1) {
+                                        state.data[index].attributes = { ...state.data[index].attributes, ...body }
+                                    }
+                                }
+                            )
+                        )
+                    )
+                })
+
+                try {
+                    await queryFulfilled
+                } catch {
+                    patchResults.forEach(patchResult => {
+                        patchResult.undo()
+                    })
+                }
+            },
+            invalidatesTags: ['Playlist'],
         }),
         uploadPlaylistCover: build.mutation<Images, { playlistId: string; file: File }>({
             query: ({ playlistId, file }) => {
@@ -55,7 +89,7 @@ export const playlistsApi = baseApi.injectEndpoints({
             invalidatesTags: ['Playlist'],
         }),
         deletePlaylistCover: build.mutation<void, { playlistId: string }>({
-            query: ({ playlistId}) => {
+            query: ({ playlistId }) => {
                 return {
                     url: `playlists/${playlistId}/images/main`,
                     method: 'DELETE',
@@ -66,4 +100,11 @@ export const playlistsApi = baseApi.injectEndpoints({
     }),
 })
 
-export const { useFetchPlaylistsQuery,useCreatePlaylistsMutation,useDeletePlaylistMutation,useUpdatePlaylistMutation,useUploadPlaylistCoverMutation, useDeletePlaylistCoverMutation} = playlistsApi
+export const {
+    useFetchPlaylistsQuery,
+    useCreatePlaylistsMutation,
+    useDeletePlaylistMutation,
+    useUpdatePlaylistMutation,
+    useUploadPlaylistCoverMutation,
+    useDeletePlaylistCoverMutation
+} = playlistsApi
