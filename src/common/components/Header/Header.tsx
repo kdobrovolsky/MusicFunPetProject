@@ -3,12 +3,12 @@ import {NavLink} from "react-router";
 import {Path} from "@/common/routing";
 import {useGetMeQuery, useLogoutMutation} from "@/features/auth/api/authApi.ts";
 import {Login} from "@/features/auth/ui/Login.tsx";
+import {Link} from "react-router/internal/react-server-client";
 
 const navItems = [
     { to: Path.Main, label: 'Main' },
     { to: Path.Playlists, label: 'Playlists' },
     { to: Path.Tracks, label: 'Tracks' },
-    { to: Path.Profile, label: 'Profile' },
 ]
 
 export const Header = () => {
@@ -37,7 +37,7 @@ export const Header = () => {
 
             {data && (
                 <div className={s.loginContainer}>
-                    <p>{data.login}</p>
+                    <Link to={Path.Profile}>{data.login}</Link>
                     <button onClick={logoutHandler}>logout</button>
                 </div>
             )}

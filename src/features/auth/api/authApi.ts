@@ -12,13 +12,13 @@ export const authApi = baseApi.injectEndpoints({
             query: payload => ({
                 url: `auth/login`,
                 method: 'POST',
-                body: { ...payload, accessTokenTTL: '3m' },
+                body: { ...payload, accessTokenTTL: '15m' },
             }),
             async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+
                 const { data } = await queryFulfilled
                 localStorage.setItem(AUTH_KEYS.accessToken, data.accessToken)
                 localStorage.setItem(AUTH_KEYS.refreshToken, data.refreshToken)
-                // Invalidate after saving tokens
                 dispatch(authApi.util.invalidateTags(['Auth']))
             },
         }),

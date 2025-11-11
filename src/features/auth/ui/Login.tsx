@@ -8,20 +8,33 @@ export const Login = () => {
         const redirectUri = import.meta.env.VITE_DOMAIN_ADDRESS + Path.OAuthRedirect
 
         // Уберите пробелы из URL
-        const url = `${import.meta.env.VITE_BASE_URL}/auth/oauth-redirect?callbackUrl=${encodeURIComponent(redirectUri)}`
+        const url = `${import.meta.env.VITE_BASE_URL}/auth/oauth-redirect?callbackUrl=${redirectUri}`
 
         window.open(url, 'oauthPopup', 'width=500, height=600')
 
         const receiveMessage = (event: MessageEvent) => {
-          if(event.origin !== import.meta.env.VITE_DOMAIN_ADDRESS) return;
+            if(event.origin !== import.meta.env.VITE_DOMAIN_ADDRESS) return;
 
             const {code} = event.data
-            if (!code) return
+            if (!code) {
+                console.error('❌ No code received')
+                return
+            }
 
             window.removeEventListener('message', receiveMessage)
-            login({code, redirectUri, rememberMe: false}) // используйте реальный code
-        }
 
+            // ✅ Добавьте обработку промиса
+            login({code, redirectUri, rememberMe: false})
+                .unwrap()
+                .then(() => {
+                    console.log('✅ Login successful!')
+                    // Можно добавить редирект или обновление UI
+                })
+                .catch((error) => {
+                    console.error('❌ Login failed:', error)
+                    // Показать ошибку пользователю
+                })
+        }
         window.addEventListener('message', receiveMessage)
 
     }
